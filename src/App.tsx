@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import "./App.css";
 
 import demoImage from "./assets/demo.png";
 import Senbei from "./components/senbei/senbei";
 
-import ReactFlow, { Node, Edge, Position } from "reactflow";
+import ReactFlow, {
+  Node,
+  Edge,
+  Position,
+  OnSelectionChangeParams,
+} from "reactflow";
 import dagre from "dagre";
 
 import "reactflow/dist/style.css";
@@ -66,71 +71,67 @@ const getLayoutedElements = (
 };
 
 function App() {
-  const initialNodes: Node[] = [
-    {
-      id: "1",
-      position: { x: 5750, y: 250 },
-      data: { label: "1" },
-    },
-    {
-      id: "2",
-      position: { x: 5750, y: 250 },
-      data: { label: "2" },
-    },
-    {
-      id: "3",
-      position: { x: 5750, y: 250 },
-      data: { label: "3" },
-    },
-    {
-      id: "4",
-      position: { x: 5750, y: 250 },
-      data: { label: "4" },
-    },
-    {
-      id: "5",
-      position: { x: 5750, y: 250 },
-      data: { label: "5" },
-    },
-  ];
-  const initialEdges: Edge[] = [
-    {
-      id: "6",
-      source: "1",
-      target: "2",
-      animated: true,
-    },
-    {
-      id: "7",
-      source: "1",
-      target: "3",
-      animated: true,
-    },
-    {
-      id: "8",
-      source: "1",
-      target: "4",
-      animated: true,
-    },
-    {
-      id: "9",
-      source: "4",
-      target: "5",
-      animated: true,
-    },
-  ];
-  const [layoutedNodes, layoutedEdges] = getLayoutedElements(
-    initialNodes,
-    initialEdges
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const [layoutedNodes, setLayoutedNodes] = useState<Node[]>([]);
+  const [layoutedEdges, setLayoutedEdges] = useState<Edge[]>([]);
+  const [id, setId] = useState<number>(0);
+  const [selectedId, setSelectedNodeId] = useState<string | undefined>(
+    undefined
   );
 
-  // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  // const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const addNode = (label: string): Node[] => {
+    console.log("add node");
+    const newNode: Node = {
+      id: id.toString(),
+      position: { x: 0, y: 0 },
+      data: { label: `${id}${label}` },
+      selected: false,
+    };
+    const newNodes = [...nodes, newNode];
+    setNodes(newNodes);
+    const nextId = id + 1;
+    setId(nextId);
+    return newNodes;
+  };
 
-  // const onConnect = useCallback(
-  //   (params) => setEdges((eds) => addEdge(params, eds)),
-  //   [setEdges]
-  // );
+  const addEdge = (source: string, target: string): Edge[] => {
+    console.log("add edge");
+    const newEdge: Edge = {
+      id: id.toString(),
+      source: source,
+      target: target,
+      animated: true,
+    };
+    const newEdges = [...edges, newEdge];
+    setEdges(newEdges);
+    setId((prev) => prev + 1);
+    return newEdges;
+  };
+
+  const addElemetnt = (label: string, source: string) => {
+    console.log("add element");
+    const newNodes = addNode(label);
+    const newEdges = addEdge(
+      source,
+      newNodes[newNodes.length - 1].id.toString()
+    );
+    updateGraph(newNodes, newEdges);
+  };
+
+  const updateGraph = (nodes: Node[], edges: Edge[]) => {
+    console.log(edges);
+    const [layoutedNodes, layoutedEdges] = getLayoutedElements(nodes, edges);
+    setLayoutedNodes(layoutedNodes);
+    setLayoutedEdges(layoutedEdges);
+  };
+
+  const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {
+    const selectedNodes = params.nodes.filter((node) => node.selected);
+    console.log(selectedNodes);
+    if (selectedNodes.length === 0) setSelectedNodeId(undefined);
+    if (selectedNodes.length === 1) setSelectedNodeId(selectedNodes[0].id);
+  }, []);
 
   const [word, setWord] = useState("");
   const [words, setWords] = useState<string[]>([]);
@@ -189,7 +190,26 @@ function App() {
   return (
     <>
       <div style={{ width: "100vw", height: "100vh" }}>
-        <ReactFlow nodes={layoutedNodes} edges={layoutedEdges}></ReactFlow>
+        <button
+          onClick={() => {
+            const newNodes = addNode("init");
+            updateGraph(newNodes, edges);
+          }}
+        >
+          init
+        </button>
+        <button
+          onClick={() =>
+            selectedId ? addElemetnt("", selectedId.toString()) : undefined
+          }
+        >
+          add
+        </button>
+        <ReactFlow
+          nodes={layoutedNodes}
+          edges={layoutedEdges}
+          onSelectionChange={onSelectionChange}
+        ></ReactFlow>
       </div>
       <body id="body">
         <Senbei />
