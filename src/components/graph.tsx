@@ -56,6 +56,17 @@ const Graph = () => {
   );
   const { setCenter } = useReactFlow();
 
+  const focusNode = (node: Node) => {
+    console.log(`focus: ${node.id}`);
+
+    setSelectedNodeId(node.id);
+    setCenter(
+      node.position.x + node.width! / 2,
+      node.position.y + node.height! / 2,
+      { duration: 500, zoom: 3 }
+    );
+  };
+
   const addNode = (label: string): Node[] => {
     console.log("add node");
     const newNode: Node = {
@@ -101,14 +112,8 @@ const Graph = () => {
     setLayoutedEdges(layoutedEdges);
   };
 
-  const onNodeClick = (e: React.MouseEvent, node: Node) => {
-    console.log(`selected: ${node.id}, ${node.position.x}, ${node.position.y}`);
-    setSelectedNodeId(node.id);
-    setCenter(
-      node.position.x + node.width! / 2,
-      node.position.y + node.height! / 2,
-      { duration: 500, zoom: 3 }
-    );
+  const onNodeClick = (_: React.MouseEvent, node: Node) => {
+    focusNode(node);
   };
 
   return (
