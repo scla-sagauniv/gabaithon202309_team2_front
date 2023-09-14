@@ -4,6 +4,11 @@ import "./App.css";
 import demoImage from "./assets/demo.png";
 import Senbei from "./components/senbei/senbei";
 
+import ReactFlow, { Node, Edge, Position } from "reactflow";
+import dagre from "dagre";
+
+import "reactflow/dist/style.css";
+
 type AttributeRes = {
   attribute: string;
 };
@@ -17,7 +22,116 @@ type NextWord = {
   minus: ChoisedRes;
 };
 
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+const nodeWidth = 172;
+const nodeHeight = 36;
+
+const getLayoutedElements = (
+  nodes: Node[],
+  edges: Edge[],
+  direction = "BT"
+): [Node[], Edge[]] => {
+  const isHorizontal = direction === "LR";
+  dagreGraph.setGraph({ rankdir: direction });
+
+  nodes.forEach((el) => {
+    dagreGraph.setNode(el.id, { width: nodeWidth, height: nodeHeight });
+  });
+  edges.forEach((el) => {
+    dagreGraph.setEdge(el.source, el.target);
+  });
+
+  dagre.layout(dagreGraph);
+
+  return [
+    nodes.map((el) => {
+      const nodeWithPosition = dagreGraph.node(el.id);
+      el.targetPosition = isHorizontal ? Position.Left : Position.Bottom;
+      el.sourcePosition = isHorizontal ? Position.Right : Position.Top;
+
+      // unfortunately we need this little hack to pass a slightly different position
+      // to notify react flow about the change. Moreover we are shifting the dagre node position
+      // (anchor=center center) to the top left so it matches the react flow node anchor point (top left).
+      el.position = {
+        x: nodeWithPosition.x - nodeWidth / 2 + Math.random() / 1000,
+        y: nodeWithPosition.y - nodeHeight / 2,
+      };
+
+      return el;
+    }),
+    edges,
+  ];
+};
+
 function App() {
+  const initialNodes: Node[] = [
+    {
+      id: "1",
+      position: { x: 5750, y: 250 },
+      data: { label: "1" },
+    },
+    {
+      id: "2",
+      position: { x: 5750, y: 250 },
+      data: { label: "2" },
+    },
+    {
+      id: "3",
+      position: { x: 5750, y: 250 },
+      data: { label: "3" },
+    },
+    {
+      id: "4",
+      position: { x: 5750, y: 250 },
+      data: { label: "4" },
+    },
+    {
+      id: "5",
+      position: { x: 5750, y: 250 },
+      data: { label: "5" },
+    },
+  ];
+  const initialEdges: Edge[] = [
+    {
+      id: "6",
+      source: "1",
+      target: "2",
+      animated: true,
+    },
+    {
+      id: "7",
+      source: "1",
+      target: "3",
+      animated: true,
+    },
+    {
+      id: "8",
+      source: "1",
+      target: "4",
+      animated: true,
+    },
+    {
+      id: "9",
+      source: "4",
+      target: "5",
+      animated: true,
+    },
+  ];
+  const [layoutedNodes, layoutedEdges] = getLayoutedElements(
+    initialNodes,
+    initialEdges
+  );
+
+  // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  // const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // const onConnect = useCallback(
+  //   (params) => setEdges((eds) => addEdge(params, eds)),
+  //   [setEdges]
+  // );
+
   const [word, setWord] = useState("");
   const [words, setWords] = useState<string[]>([]);
   const [input, setInput] = useState("");
@@ -74,6 +188,9 @@ function App() {
   };
   return (
     <>
+      <div style={{ width: "100vw", height: "100vh" }}>
+        <ReactFlow nodes={layoutedNodes} edges={layoutedEdges}></ReactFlow>
+      </div>
       <body id="body">
         <Senbei />
       </body>
