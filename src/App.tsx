@@ -1,15 +1,10 @@
-import { useCallback, useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 
 import demoImage from "./assets/demo.png";
 import Senbei from "./components/senbei/senbei";
 
-import ReactFlow, {
-  Node,
-  Edge,
-  Position,
-  OnSelectionChangeParams,
-} from "reactflow";
+import ReactFlow, { Node, Edge, Position } from "reactflow";
 import dagre from "dagre";
 
 import "reactflow/dist/style.css";
@@ -120,18 +115,15 @@ function App() {
   };
 
   const updateGraph = (nodes: Node[], edges: Edge[]) => {
-    console.log(edges);
     const [layoutedNodes, layoutedEdges] = getLayoutedElements(nodes, edges);
     setLayoutedNodes(layoutedNodes);
     setLayoutedEdges(layoutedEdges);
   };
 
-  const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {
-    const selectedNodes = params.nodes.filter((node) => node.selected);
-    console.log(selectedNodes);
-    if (selectedNodes.length === 0) setSelectedNodeId(undefined);
-    if (selectedNodes.length === 1) setSelectedNodeId(selectedNodes[0].id);
-  }, []);
+  const onNodeClick = (e: React.MouseEvent, node: Node) => {
+    console.log("selected");
+    setSelectedNodeId(node.id);
+  };
 
   const [word, setWord] = useState("");
   const [words, setWords] = useState<string[]>([]);
@@ -208,7 +200,7 @@ function App() {
         <ReactFlow
           nodes={layoutedNodes}
           edges={layoutedEdges}
-          onSelectionChange={onSelectionChange}
+          onNodeClick={onNodeClick}
         ></ReactFlow>
       </div>
       <body id="body">
