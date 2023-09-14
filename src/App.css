@@ -31,6 +31,7 @@
   bottom: 50px;
  opacity: 0.7;
 
+
 }
 
 
@@ -38,6 +39,9 @@
 #dear {
   height: 400px;
   width: 400px;
+  position: absolute;
+  right: 37%;
+  top:15%;
 
 }
 
@@ -52,12 +56,13 @@
   position: absolute;
   right: 20%;
   bottom: 20%;
-  border: 6px red solid;
+  border: 6px rgb(253, 83, 83) solid;
   width: 180px;
   border-radius: 20px;
   height: 80px;
   font-size: x-large;
   font-weight: bolder;
+  display: none;
 }
 
 #plusbutton:hover,
@@ -71,12 +76,13 @@
   position: absolute;
   left: 20%;
   bottom: 20%;
-  border: 6px red solid;
+  border: 6px rgb(52, 116, 255) solid;
   width: 180px;
   border-radius: 20px;
   height: 80px;
   font-size: x-large;
   font-weight: bolder;
+  display: none;
 
 
 
