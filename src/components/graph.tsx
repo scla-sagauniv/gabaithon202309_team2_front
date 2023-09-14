@@ -54,7 +54,7 @@ const Graph = () => {
   const [selectedId, setSelectedNodeId] = useState<string | undefined>(
     undefined
   );
-  const { setViewport } = useReactFlow();
+  const { setCenter } = useReactFlow();
 
   const addNode = (label: string): Node[] => {
     console.log("add node");
@@ -102,11 +102,12 @@ const Graph = () => {
   };
 
   const onNodeClick = (e: React.MouseEvent, node: Node) => {
-    console.log("selected");
+    console.log(`selected: ${node.id}, ${node.position.x}, ${node.position.y}`);
     setSelectedNodeId(node.id);
-    setViewport(
-      { x: node.position.x, y: node.position.y, zoom: 1 },
-      { duration: 800 }
+    setCenter(
+      node.position.x + node.width! / 2,
+      node.position.y + node.height! / 2,
+      { duration: 500, zoom: 3 }
     );
   };
 
