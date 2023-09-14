@@ -1,35 +1,105 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
+
+import demoImage from "./assets/demo.png";
+
+type AttributeRes = {
+  attribute: string;
+};
+
+type ChoisedRes = {
+  word: string;
+};
+
+type NextWord = {
+  plus: ChoisedRes;
+  minus: ChoisedRes;
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [word, setWord] = useState("");
+  const [words, setWords] = useState<string[]>([]);
+  const [input, setInput] = useState("");
+  const [attribute, setAttribute] = useState("");
+  const [plusWord, setPlusWord] = useState("");
+  const [minusWord, setMinusWord] = useState("");
 
+  const onPlus = () => {
+    console.log("plus");
+    subimt(plusWord);
+  };
+
+  const onMinus = () => {
+    console.log("minus");
+    subimt(minusWord);
+  };
+
+  const onInit = () => {
+    console.log("init");
+    subimt(input);
+  };
+
+  const subimt = (word: string) => {
+    setWord(word);
+    setWords((prev: string[]) => {
+      return [...prev, word];
+    });
+    const attrRes = getAttribute(word);
+    setAttribute(attrRes.attribute);
+    const nextRes = getNextWord(word, attrRes.attribute);
+    setPlusWord(nextRes.plus.word);
+    setMinusWord(nextRes.minus.word);
+  };
+
+  const getNextWord = (word: string, attribute: string): NextWord => {
+    console.log("getNextWord");
+    const res: NextWord = {
+      plus: {
+        word: `${word}+${attribute}`,
+      },
+      minus: {
+        word: `${word}-${attribute}`,
+      },
+    };
+    return res;
+  };
+
+  const getAttribute = (word: string): AttributeRes => {
+    console.log(`getAttribute: ${word}`);
+    const res: AttributeRes = {
+      attribute: `attr${words.length}`,
+    };
+    return res;
+  };
   return (
     <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <img src={demoImage} alt="" />
+        <div style={{ display: "flex" }}>
+          <div style={{ display: "block" }}>
+            <button style={{ borderColor: "white" }} onClick={onMinus}>
+              minus
+            </button>
+            <p>{minusWord}</p>
+          </div>
+          <p>{attribute}</p>
+          <div style={{ display: "block" }}>
+            <button style={{ borderColor: "white" }} onClick={onPlus}>
+              plus
+            </button>
+            <p>{plusWord}</p>
+          </div>
+        </div>
+        <p>{word}</p>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <button onClick={onInit}>submit</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
