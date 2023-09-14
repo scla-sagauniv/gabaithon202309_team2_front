@@ -1,5 +1,23 @@
 # React + TypeScript + Vite
 
+## Start Up
+Windowsの人はWSL上でやることをお勧めします
+```bash
+# voltaインストール
+# すでにnodeが入ってる人はnodeのアンインストールからしないといけないので、voltaインストールせずに、
+# "node": "18.17.1",
+# "yarn": "1.22.19"
+# にバージョン合わせる方が簡単かも？？
+# voltaあったほうが楽なのは間違いない
+curl https://get.volta.sh | bash
+volta -v
+# > 1.1.0
+
+yarn install
+yarn dev
+# http://localhost:3000 にアクセス
+```
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
