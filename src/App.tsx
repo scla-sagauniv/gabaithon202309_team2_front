@@ -25,6 +25,8 @@ function App() {
   const [plusWord, setPlusWord] = useState("");
   const [minusWord, setMinusWord] = useState("");
 
+  
+
   const onPlus = () => {
     console.log("plus");
     subimt(plusWord);
@@ -38,6 +40,11 @@ function App() {
   const onInit = () => {
     console.log("init");
     subimt(input);
+    document.getElementById("submitbutton").style.display = "none";
+    document.getElementById("plusbutton").style.display = "block";
+    document.getElementById("minusbutton").style.display = "block";
+    document.getElementById("firstword").style.display ="none";
+    
   };
 
   const subimt = (word: string) => {
@@ -81,14 +88,14 @@ function App() {
           <img src={demoImage} alt="" id="dear" />
           <div style={{ display: "flex" }}>
             <div style={{ display: "block" }}>
-              <button style={{ borderColor: "white" }} onClick={onMinus} id="minusbutton">
+              <button onClick={onMinus} id="minusbutton">
                 たべない！
               </button>
               <p>{minusWord}</p>
             </div>
             <p>{attribute}</p>
             <div style={{ display: "block" }}>
-              <button style={{ borderColor: "white" }} onClick={onPlus} id="plusbutton">
+              <button onClick={onPlus} id="plusbutton">
                 たべる！
               </button>
               <p>{plusWord}</p>
