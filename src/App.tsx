@@ -1,8 +1,8 @@
 import { useState } from "react";
 import "./App.css";
-
+import senbeiImage from "./assets/senbei.png"
 import demoImage from "./assets/demo.png";
-import Senbei from "./components/senbei/senbei";
+
 
 type AttributeRes = {
   attribute: string;
@@ -75,33 +75,34 @@ function App() {
   return (
     <>
       <body id="body">
-        <Senbei />
-      </body>
-      <div>
-        <img src={demoImage} alt="" />
-        <div style={{ display: "flex" }}>
-          <div style={{ display: "block" }}>
-            <button style={{ borderColor: "white" }} onClick={onMinus}>
-              minus
-            </button>
-            <p>{minusWord}</p>
+        <h1>しかしかパラダイス!!!</h1>
+        <img src={senbeiImage} id="senbei" />
+        <div id="container">
+          <img src={demoImage} alt="" id="dear" />
+          <div style={{ display: "flex" }}>
+            <div style={{ display: "block" }}>
+              <button style={{ borderColor: "white" }} onClick={onMinus} id="minusbutton">
+                たべない！
+              </button>
+              <p>{minusWord}</p>
+            </div>
+            <p>{attribute}</p>
+            <div style={{ display: "block" }}>
+              <button style={{ borderColor: "white" }} onClick={onPlus} id="plusbutton">
+                たべる！
+              </button>
+              <p>{plusWord}</p>
+            </div>
           </div>
-          <p>{attribute}</p>
-          <div style={{ display: "block" }}>
-            <button style={{ borderColor: "white" }} onClick={onPlus}>
-              plus
-            </button>
-            <p>{plusWord}</p>
-          </div>
+          <p>{word}</p>
+          <input id="firstword"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button onClick={onInit} id="submitbutton">あげる</button>
         </div>
-        <p>{word}</p>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <button onClick={onInit}>submit</button>
-      </div>
+      </body>
     </>
   );
 }
