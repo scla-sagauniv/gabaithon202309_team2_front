@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 
 import demoImage from "./assets/demo.png";
+import Senbei from "./components/senbei/senbei";
 
 type AttributeRes = {
   attribute: string;
@@ -73,6 +74,9 @@ function App() {
   };
   return (
     <>
+      <body id="body">
+        <Senbei />
+      </body>
       <div>
         <img src={demoImage} alt="" />
         <div style={{ display: "flex" }}>

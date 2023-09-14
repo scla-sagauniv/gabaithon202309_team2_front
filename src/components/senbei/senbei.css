@@ -1,0 +1,20 @@
+#border{
+    position: relative;
+   margin-top: 45vw;
+}
+
+#img {
+    width: 301px;
+    height:200px;
+
+}
+
+#input {
+    position: absolute;
+right: 20%;
+bottom:45%;
+height: 30px;
+border-radius: 10px;
+border: black 4px solid;
+
+}
