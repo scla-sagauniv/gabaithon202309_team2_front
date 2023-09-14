@@ -1,9 +1,95 @@
-#body{display: flex;
+#body {
+  display: flex;
   justify-content: center;
   background-image: url("./assets/bokujo.jpeg");
   background-size: 1000px;
   background-repeat: repeat-x;
   width: 100vw;
+
+
+}
+
+#firstword {
+
+
+  position: absolute;
+  right: 20%;
+  bottom: 45%;
+  height: 30px;
+  border-radius: 10px;
+  border: black 3px solid;
+  right: 44%;
+  bottom: 19%;
+
+}
+
+#senbei {
+  width: 300px;
+  height: 180px;
+
+  position: absolute;
+  bottom: 50px;
+ opacity: 0.7;
+
+}
+
+
+
+#dear {
+  height: 400px;
+  width: 400px;
+
+}
+
+#submitbutton {
+  position: absolute;
+  right: 33%;
+  bottom: 20%;
+
+}
+
+#plusbutton {
+  position: absolute;
+  right: 20%;
+  bottom: 20%;
+  border: 6px red solid;
+  width: 180px;
+  border-radius: 20px;
+  height: 80px;
+  font-size: x-large;
+  font-weight: bolder;
+}
+
+#plusbutton:hover,
+#minusbutton:hover {
+
+  background-color: rgb(147, 147, 147);
+}
+
+#minusbutton {
+
+  position: absolute;
+  left: 20%;
+  bottom: 20%;
+  border: 6px red solid;
+  width: 180px;
+  border-radius: 20px;
+  height: 80px;
+  font-size: x-large;
+  font-weight: bolder;
+
+
+
+}
+
+h1 {
+  position: absolute;
+  top: 1px;
+  left: 37%;
   
- 
+  
+
+
+
+
 }
