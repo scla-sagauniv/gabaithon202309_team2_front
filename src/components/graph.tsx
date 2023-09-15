@@ -2,6 +2,19 @@ import dagre from "dagre";
 import { useState } from "react";
 import ReactFlow, { Edge, Node, Position, useReactFlow } from "reactflow";
 
+type AttributeRes = {
+  attribute: string;
+};
+
+type ChoisedRes = {
+  word: string;
+};
+
+type NextWord = {
+  plus: ChoisedRes;
+  minus: ChoisedRes;
+};
+
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
@@ -50,11 +63,19 @@ const Graph = () => {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [layoutedNodes, setLayoutedNodes] = useState<Node[]>([]);
   const [layoutedEdges, setLayoutedEdges] = useState<Edge[]>([]);
-  const [id, setId] = useState<number>(0);
+  const [nodeId, setNodeId] = useState<number>(0);
+  const [edgeId, setEdgeId] = useState<number>(0);
   const [selectedId, setSelectedNodeId] = useState<string | undefined>(
     undefined
   );
   const { setCenter } = useReactFlow();
+
+  const [word, setWord] = useState("");
+  const [words, setWords] = useState<string[]>([]);
+  const [input, setInput] = useState("");
+  const [attribute, setAttribute] = useState("");
+  const [plusWord, setPlusWord] = useState("");
+  const [minusWord, setMinusWord] = useState("");
 
   const focusNode = (node: Node) => {
     console.log(`focus: ${node.id}`);
@@ -67,43 +88,67 @@ const Graph = () => {
     );
   };
 
-  const addNode = (label: string): Node[] => {
+  const addNodes = (labels: string[]): Node[] => {
     console.log("add node");
-    const newNode: Node = {
-      id: id.toString(),
-      position: { x: 0, y: 0 },
-      data: { label: `${id}${label}` },
-      selected: false,
-    };
-    const newNodes = [...nodes, newNode];
-    setNodes(newNodes);
-    const nextId = id + 1;
-    setId(nextId);
-    return newNodes;
+    let nextId = nodeId;
+    const newNodes: Node[] = [];
+    for (const label of labels) {
+      newNodes.push({
+        id: nextId.toString(),
+        position: { x: 0, y: 0 },
+        data: { label: `${nextId}${label}` },
+        selected: false,
+      });
+      nextId = nextId + 1;
+    }
+    const afterNodes = [...nodes, ...newNodes];
+    setNodes(afterNodes);
+    setNodeId(nextId);
+    return afterNodes;
   };
 
-  const addEdge = (source: string, target: string): Edge[] => {
+  type AddEdgeParam = {
+    source: string;
+    target: string;
+  };
+  const addEdges = (params: AddEdgeParam[]): Edge[] => {
     console.log("add edge");
-    const newEdge: Edge = {
-      id: id.toString(),
-      source: source,
-      target: target,
-      animated: true,
-    };
-    const newEdges = [...edges, newEdge];
-    setEdges(newEdges);
-    setId((prev) => prev + 1);
-    return newEdges;
+    let nextId = edgeId;
+    const newEdges: Edge[] = [];
+    for (const param of params) {
+      newEdges.push({
+        id: nextId.toString(),
+        source: param.source,
+        target: param.target,
+        animated: true,
+      });
+      nextId = nextId + 1;
+    }
+    const afterEdges = [...edges, ...newEdges];
+    setEdges(afterEdges);
+    setEdgeId(nextId);
+    return afterEdges;
   };
 
-  const addElemetnt = (label: string, source: string) => {
+  type AddElementParam = {
+    label: string;
+    source: string;
+    target: string;
+  };
+  const addElemetnts = (params: AddElementParam[]): [Node[], Edge[]] => {
     console.log("add element");
-    const newNodes = addNode(label);
-    const newEdges = addEdge(
-      source,
-      newNodes[newNodes.length - 1].id.toString()
-    );
-    updateGraph(newNodes, newEdges);
+    const labels: string[] = [];
+    const edgeParams: AddEdgeParam[] = [];
+    for (let i = 0; i < params.length; i++) {
+      labels.push(params[i].label);
+      edgeParams.push({
+        source: params[i].source,
+        target: params[i].target,
+      });
+    }
+    const newNodes = addNodes(labels);
+    const newEdges = addEdges(edgeParams);
+    return [newNodes, newEdges];
   };
 
   const updateGraph = (nodes: Node[], edges: Edge[]) => {
@@ -116,22 +161,81 @@ const Graph = () => {
     focusNode(node);
   };
 
+  const onInit = () => {
+    addNodes([input]);
+    subimt(input, (0).toString());
+  };
+
+  const onChoice = (choiced: boolean) => {
+    subimt(choiced ? plusWord : minusWord, selectedId!.toString());
+  };
+
+  const subimt = (word: string, selectedId: string) => {
+    const params: AddElementParam[] = [];
+    const attrRes = getAttribute(word);
+    const nextRes = getNextWord(word, attrRes.attribute);
+    setMinusWord(nextRes.minus.word);
+    setPlusWord(nextRes.plus.word);
+    params.push({
+      label: nextRes.minus.word,
+      source: selectedId,
+      target: (nodeId + 1).toString(),
+    });
+    params.push({
+      label: nextRes.plus.word,
+      source: selectedId,
+      target: (nodeId + 2).toString(),
+    });
+    const [newNodes, newEdges] = addElemetnts(params);
+    console.log(newNodes);
+    updateGraph(newNodes, newEdges);
+  };
+
+  const getNextWord = (word: string, attribute: string): NextWord => {
+    console.log("getNextWord");
+    const res: NextWord = {
+      plus: {
+        word: `${word}+${attribute}`,
+      },
+      minus: {
+        word: `${word}-${attribute}`,
+      },
+    };
+    return res;
+  };
+
+  const getAttribute = (word: string): AttributeRes => {
+    console.log(`getAttribute: ${word}`);
+    const res: AttributeRes = {
+      attribute: `attr${words.length}`,
+    };
+    return res;
+  };
+
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
+      <div style={{ display: "block", marginBottom: 15 }}>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <button onClick={onInit} style={{ borderColor: "white" }}>
+          init
+        </button>
+      </div>
       <button
-        onClick={() => {
-          const newNodes = addNode("init");
-          updateGraph(newNodes, edges);
-        }}
+        onClick={() => (selectedId ? onChoice(false) : undefined)}
+        style={{ borderColor: "white" }}
       >
-        init
+        minus
       </button>
+      <a>{attribute}</a>
       <button
-        onClick={() =>
-          selectedId ? addElemetnt("", selectedId.toString()) : undefined
-        }
+        onClick={() => (selectedId ? onChoice(true) : undefined)}
+        style={{ borderColor: "white", marginBottom: 15 }}
       >
-        add
+        plus
       </button>
       <ReactFlow
         nodes={layoutedNodes}
