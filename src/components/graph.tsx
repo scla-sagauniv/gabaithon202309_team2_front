@@ -63,15 +63,13 @@ const Graph = () => {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [layoutedNodes, setLayoutedNodes] = useState<Node[]>([]);
   const [layoutedEdges, setLayoutedEdges] = useState<Edge[]>([]);
-  const [nodeId, setNodeId] = useState<number>(0);
+  const [nodeId, setNodeId] = useState<number>(-1);
   const [edgeId, setEdgeId] = useState<number>(0);
   const [selectedId, setSelectedNodeId] = useState<string | undefined>(
     undefined
   );
   const { setCenter } = useReactFlow();
 
-  const [word, setWord] = useState("");
-  const [words, setWords] = useState<string[]>([]);
   const [input, setInput] = useState("");
   const [attribute, setAttribute] = useState("");
   const [plusWord, setPlusWord] = useState("");
@@ -93,13 +91,13 @@ const Graph = () => {
     let nextId = nodeId;
     const newNodes: Node[] = [];
     for (const label of labels) {
+      nextId = nextId + 1;
       newNodes.push({
         id: nextId.toString(),
         position: { x: 0, y: 0 },
         data: { label: `${nextId}${label}` },
         selected: false,
       });
-      nextId = nextId + 1;
     }
     const afterNodes = [...nodes, ...newNodes];
     setNodes(afterNodes);
@@ -116,13 +114,13 @@ const Graph = () => {
     let nextId = edgeId;
     const newEdges: Edge[] = [];
     for (const param of params) {
+      nextId = nextId + 1;
       newEdges.push({
         id: nextId.toString(),
         source: param.source,
         target: param.target,
         animated: true,
       });
-      nextId = nextId + 1;
     }
     const afterEdges = [...edges, ...newEdges];
     setEdges(afterEdges);
@@ -131,23 +129,13 @@ const Graph = () => {
   };
 
   type AddElementParam = {
-    label: string;
-    source: string;
-    target: string;
+    labels: string[];
+    edgeParams: AddEdgeParam[];
   };
-  const addElemetnts = (params: AddElementParam[]): [Node[], Edge[]] => {
+  const addElemetnts = (param: AddElementParam): [Node[], Edge[]] => {
     console.log("add element");
-    const labels: string[] = [];
-    const edgeParams: AddEdgeParam[] = [];
-    for (let i = 0; i < params.length; i++) {
-      labels.push(params[i].label);
-      edgeParams.push({
-        source: params[i].source,
-        target: params[i].target,
-      });
-    }
-    const newNodes = addNodes(labels);
-    const newEdges = addEdges(edgeParams);
+    const newNodes = addNodes(param.labels);
+    const newEdges = addEdges(param.edgeParams);
     return [newNodes, newEdges];
   };
 
@@ -162,32 +150,48 @@ const Graph = () => {
   };
 
   const onInit = () => {
-    addNodes([input]);
-    subimt(input, (0).toString());
+    subimt(input, (0).toString(), true);
   };
 
   const onChoice = (choiced: boolean) => {
     subimt(choiced ? plusWord : minusWord, selectedId!.toString());
   };
 
-  const subimt = (word: string, selectedId: string) => {
-    const params: AddElementParam[] = [];
+  const subimt = (
+    word: string,
+    selectedId: string,
+    isInit: boolean = false
+  ) => {
+    const param: AddElementParam = {
+      labels: [],
+      edgeParams: [],
+    };
+    let targetBaseId = nodeId;
+    if (isInit) {
+      param.labels.push(word);
+      targetBaseId += 1;
+    }
     const attrRes = getAttribute(word);
+    setAttribute(attrRes.attribute);
     const nextRes = getNextWord(word, attrRes.attribute);
     setMinusWord(nextRes.minus.word);
     setPlusWord(nextRes.plus.word);
-    params.push({
-      label: nextRes.minus.word,
+    param.labels.push(nextRes.minus.word);
+    param.edgeParams.push({
       source: selectedId,
-      target: (nodeId + 1).toString(),
+      target: (targetBaseId + 1).toString(),
     });
-    params.push({
-      label: nextRes.plus.word,
+    param.labels.push(nextRes.plus.word);
+    param.edgeParams.push({
       source: selectedId,
-      target: (nodeId + 2).toString(),
+      target: (targetBaseId + 2).toString(),
     });
-    const [newNodes, newEdges] = addElemetnts(params);
-    console.log(newNodes);
+    const [newNodes, newEdges] = addElemetnts(param);
+    console.log(newEdges);
+    setNodeId((prev) => {
+      console.log(prev);
+      return prev;
+    });
     updateGraph(newNodes, newEdges);
   };
 
@@ -207,7 +211,7 @@ const Graph = () => {
   const getAttribute = (word: string): AttributeRes => {
     console.log(`getAttribute: ${word}`);
     const res: AttributeRes = {
-      attribute: `attr${words.length}`,
+      attribute: `attr${nodeId}`,
     };
     return res;
   };
