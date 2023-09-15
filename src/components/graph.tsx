@@ -126,8 +126,12 @@ const Graph = () => {
         id: nextId.toString(),
         source: param.source,
         target: param.target,
-        animated: true,
+        animated: false,
         zIndex: 1,
+        style: {
+          strokeWidth: 15,
+          stroke: "#6a3906",
+        },
       });
     }
     const afterEdges = [...edges, ...newEdges];
