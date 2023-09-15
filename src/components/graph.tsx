@@ -119,12 +119,14 @@ const Graph = () => {
   type AddEdgeParam = {
     source: string;
     target: string;
+    choice: boolean;
   };
   const addEdges = (params: AddEdgeParam[]): Edge[] => {
     console.log("add edge");
     let nextId = edgeId;
     const newEdges: Edge[] = [];
     for (const param of params) {
+      const choiceStr = param.choice ? "食べる" : "食べない";
       nextId = nextId + 1;
       newEdges.push({
         id: nextId.toString(),
@@ -136,6 +138,7 @@ const Graph = () => {
           strokeWidth: 15,
           stroke: "#6a3906",
         },
+        label: choiceStr,
       });
     }
     const afterEdges = [...edges, ...newEdges];
@@ -168,12 +171,25 @@ const Graph = () => {
     focusNode(node);
   };
 
+  const onEdgeClick = (_: React.MouseEvent, edge: Edge) => {
+    const targetNode = nodes.filter((node) => node.id === edge.target)[0];
+    focusNode(targetNode);
+    if (edge.label === "食べる") {
+      onChoice(true);
+    } else {
+      onChoice(false);
+    }
+  };
+
   const onInit = () => {
     subimt(input, (0).toString(), true);
   };
 
   const onChoice = (choiced: boolean) => {
-    subimt(choiced ? plusWord : minusWord, selectedId!.toString());
+    setSelectedNodeId((prev) => {
+      subimt(choiced ? plusWord : minusWord, prev!.toString());
+      return prev;
+    });
   };
 
   const subimt = async (
@@ -199,11 +215,13 @@ const Graph = () => {
     param.edgeParams.push({
       source: selectedId,
       target: (targetBaseId + 1).toString(),
+      choice: false,
     });
     param.labels.push(nextRes.plus.word);
     param.edgeParams.push({
       source: selectedId,
       target: (targetBaseId + 2).toString(),
+      choice: true,
     });
     const [newNodes, newEdges] = addElemetnts(param, isInit);
     console.log(newEdges);
@@ -338,6 +356,7 @@ const Graph = () => {
               nodes={layoutedNodes}
               edges={layoutedEdges}
               onNodeClick={onNodeClick}
+              onEdgeClick={onEdgeClick}
               nodeTypes={nodeTypes}
             ></ReactFlow>
           </div>
@@ -347,13 +366,13 @@ const Graph = () => {
           <input
             id="firstword"
             type="text"
-            value={input}
+            value={nodes.length === 0 ? input : attribute}
             onChange={(e) => setInput(e.target.value)}
           />
           {nodes.length === 0 ? (
             <button id="submitbutton" onClick={onInit}>
               {" "}
-              名前をつける{" "}
+              名前をつける ƒ
             </button>
           ) : undefined}
         </div>
