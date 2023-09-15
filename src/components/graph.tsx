@@ -3,6 +3,7 @@ import { useState } from "react";
 import ReactFlow, { Edge, Node, Position, useReactFlow } from "reactflow";
 import CustomNode from "./CustomNode";
 import senbeiImage from "../assets/senbei.png";
+import demoImage from "../assets/demo.png";
 
 import "./graph.css";
 
@@ -90,7 +91,7 @@ const Graph = () => {
     setCenter(
       node.position.x + node.width! / 2,
       node.position.y + node.height! / 2 + 100,
-      { duration: 500, zoom: 2 }
+      { duration: 500, zoom: 1.7 }
     );
   };
 
@@ -316,7 +317,7 @@ const Graph = () => {
       </button>
       <body id="body">
         <h1>しかしかパラダイス!!!</h1>
-        <img src={senbeiImage} id="senbei" />
+        {nodes.length !== 0 ? <img src={senbeiImage} id="senbei" /> : undefined}
         <div id="container">
           <div style={{ display: "flex" }}>
             <div style={{ display: "block" }}>
@@ -340,15 +341,21 @@ const Graph = () => {
               nodeTypes={nodeTypes}
             ></ReactFlow>
           </div>
+          {nodes.length === 0 ? (
+            <img src={demoImage} alt="" id="dear" />
+          ) : undefined}
           <input
             id="firstword"
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
-          <button id="submitbutton" onClick={onInit}>
-            あげる
-          </button>
+          {nodes.length === 0 ? (
+            <button id="submitbutton" onClick={onInit}>
+              {" "}
+              名前をつける{" "}
+            </button>
+          ) : undefined}
         </div>
       </body>
     </div>
