@@ -2,10 +2,10 @@
   display: flex;
   justify-content: center;
   background-image: url("../assets/bokujo.jpeg");
-  background-size: 1000px;
+  background-size: 100%;
   background-repeat: repeat-x;
   width: 100vw;
-
+  height: "100vh"
 
 }
 

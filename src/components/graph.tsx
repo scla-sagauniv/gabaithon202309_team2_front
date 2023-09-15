@@ -90,8 +90,8 @@ const Graph = () => {
     setSelectedNodeId(node.id);
     setCenter(
       node.position.x + node.width! / 2,
-      node.position.y + node.height! / 2 + 100,
-      { duration: 500, zoom: 1.7 }
+      node.position.y + node.height! / 2,
+      { duration: 500, zoom: 1.8 }
     );
   };
 
@@ -173,7 +173,8 @@ const Graph = () => {
 
   const onEdgeClick = (_: React.MouseEvent, edge: Edge) => {
     const targetNode = nodes.filter((node) => node.id === edge.target)[0];
-    focusNode(targetNode);
+    // focusNode(targetNode);
+    setSelectedNodeId(targetNode.id);
     if (edge.label === "食べる") {
       onChoice(true);
     } else {
@@ -310,47 +311,10 @@ const Graph = () => {
   };
   return (
     <div>
-      {/* <div style={{ display: "block", marginBottom: 15 }}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <button onClick={onInit} style={{ borderColor: "white" }}>
-          init
-        </button>
-      </div> */}
-      <button
-        onClick={() => (selectedId ? onChoice(false) : undefined)}
-        style={{ borderColor: "white" }}
-      >
-        minus
-      </button>
-      <a>{attribute}</a>
-      <button
-        onClick={() => (selectedId ? onChoice(true) : undefined)}
-        style={{ borderColor: "white", marginBottom: 15 }}
-      >
-        plus
-      </button>
       <body id="body">
         <h1>しかしかパラダイス!!!</h1>
         {nodes.length !== 0 ? <img src={senbeiImage} id="senbei" /> : undefined}
         <div id="container">
-          <div style={{ display: "flex" }}>
-            <div style={{ display: "block" }}>
-              <button id="minusbutton">たべない！</button>
-              <p>minusWord</p>
-            </div>
-            <p>attribute</p>
-            <div style={{ display: "block" }}>
-              <button id="plusbutton" onClick={onInit}>
-                たべる！
-              </button>
-              <p>plusWord</p>
-            </div>
-          </div>
-          <p>word</p>
           <div style={{ width: "100vw", height: "100vh" }}>
             <ReactFlow
               nodes={layoutedNodes}
