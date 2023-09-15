@@ -1,86 +1,17 @@
-import { useState } from "react";
 import "./App.css";
-import senbeiImage from "./assets/senbei.png"
+import senbeiImage from "./assets/senbei.png";
 import demoImage from "./assets/demo.png";
 
-
-type AttributeRes = {
-  attribute: string;
-};
-
-type ChoisedRes = {
-  word: string;
-};
-
-type NextWord = {
-  plus: ChoisedRes;
-  minus: ChoisedRes;
-};
+import "reactflow/dist/style.css";
+import { ReactFlowProvider } from "reactflow";
+import Graph from "./components/graph";
 
 function App() {
-  const [word, setWord] = useState("");
-  const [words, setWords] = useState<string[]>([]);
-  const [input, setInput] = useState("");
-  const [attribute, setAttribute] = useState("");
-  const [plusWord, setPlusWord] = useState("");
-  const [minusWord, setMinusWord] = useState("");
-
-  
-
-  const onPlus = () => {
-    console.log("plus");
-    subimt(plusWord);
-  };
-
-  const onMinus = () => {
-    console.log("minus");
-    subimt(minusWord);
-  };
-
-  const onInit = () => {
-    console.log("init");
-    subimt(input);
-    document.getElementById("submitbutton").style.display = "none";
-    document.getElementById("plusbutton").style.display = "block";
-    document.getElementById("minusbutton").style.display = "block";
-    document.getElementById("firstword").style.display ="none";
-    
-  };
-
-  const subimt = (word: string) => {
-    setWord(word);
-    setWords((prev: string[]) => {
-      return [...prev, word];
-    });
-    const attrRes = getAttribute(word);
-    setAttribute(attrRes.attribute);
-    const nextRes = getNextWord(word, attrRes.attribute);
-    setPlusWord(nextRes.plus.word);
-    setMinusWord(nextRes.minus.word);
-  };
-
-  const getNextWord = (word: string, attribute: string): NextWord => {
-    console.log("getNextWord");
-    const res: NextWord = {
-      plus: {
-        word: `${word}+${attribute}`,
-      },
-      minus: {
-        word: `${word}-${attribute}`,
-      },
-    };
-    return res;
-  };
-
-  const getAttribute = (word: string): AttributeRes => {
-    console.log(`getAttribute: ${word}`);
-    const res: AttributeRes = {
-      attribute: `attr${words.length}`,
-    };
-    return res;
-  };
   return (
     <>
+      <ReactFlowProvider>
+        <Graph />
+      </ReactFlowProvider>
       <body id="body">
         <h1>しかしかパラダイス!!!</h1>
         <img src={senbeiImage} id="senbei" />
@@ -88,26 +19,23 @@ function App() {
           <img src={demoImage} alt="" id="dear" />
           <div style={{ display: "flex" }}>
             <div style={{ display: "block" }}>
-              <button onClick={onMinus} id="minusbutton">
-                たべない！
-              </button>
-              <p>{minusWord}</p>
+              <button id="minusbutton">たべない！</button>
+              <p>minusWord</p>
             </div>
-            <p>{attribute}</p>
+            <p>attribute</p>
             <div style={{ display: "block" }}>
-              <button onClick={onPlus} id="plusbutton">
-                たべる！
-              </button>
-              <p>{plusWord}</p>
+              <button id="plusbutton">たべる！</button>
+              <p>plusWord</p>
             </div>
           </div>
-          <p>{word}</p>
-          <input id="firstword"
+          <p>word</p>
+          <input
+            id="firstword"
             type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
+            // value={input}
+            // onChange={(e) => setInput(e.target.value)}
           />
-          <button onClick={onInit} id="submitbutton">あげる</button>
+          <button id="submitbutton">あげる</button>
         </div>
       </body>
     </>
