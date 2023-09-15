@@ -95,7 +95,7 @@ const Graph = () => {
       newNodes.push({
         id: nextId.toString(),
         position: { x: 0, y: 0 },
-        data: { label: `${nextId}${label}` },
+        data: { label: `${label}` },
         selected: false,
       });
     }
@@ -157,7 +157,7 @@ const Graph = () => {
     subimt(choiced ? plusWord : minusWord, selectedId!.toString());
   };
 
-  const subimt = (
+  const subimt = async (
     word: string,
     selectedId: string,
     isInit: boolean = false
@@ -171,9 +171,9 @@ const Graph = () => {
       param.labels.push(word);
       targetBaseId += 1;
     }
-    const attrRes = getAttribute(word);
+    const attrRes = await getAttribute(word);
     setAttribute(attrRes.attribute);
-    const nextRes = getNextWord(word, attrRes.attribute);
+    const nextRes = await getNextWord(word, attrRes.attribute);
     setMinusWord(nextRes.minus.word);
     setPlusWord(nextRes.plus.word);
     param.labels.push(nextRes.minus.word);
@@ -195,25 +195,81 @@ const Graph = () => {
     updateGraph(newNodes, newEdges);
   };
 
-  const getNextWord = (word: string, attribute: string): NextWord => {
+  const getNextWord = async (
+    word: string,
+    attribute: string
+  ): Promise<NextWord> => {
     console.log("getNextWord");
-    const res: NextWord = {
+    let pWord = "";
+    let nWord = "";
+    const data = {
+      word: word,
+      attribute: attribute,
+      choiced: true,
+    };
+    let res = await fetch(`${import.meta.env.VITE_BASE_URL}/choiced`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (res.status == 200) {
+      const json = await res.json();
+      console.log(json);
+      pWord = json.word;
+    } else {
+      console.log(res.body);
+    }
+    data.choiced = false;
+    res = await fetch(`${import.meta.env.VITE_BASE_URL}/choiced`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (res.status == 200) {
+      const json = await res.json();
+      console.log(json);
+      nWord = json.word;
+    } else {
+      console.log(res.body);
+    }
+    const result: NextWord = {
       plus: {
-        word: `${word}+${attribute}`,
+        word: pWord,
       },
       minus: {
-        word: `${word}-${attribute}`,
+        word: nWord,
       },
     };
-    return res;
+    return result;
   };
 
-  const getAttribute = (word: string): AttributeRes => {
+  const getAttribute = async (word: string): Promise<AttributeRes> => {
     console.log(`getAttribute: ${word}`);
-    const res: AttributeRes = {
-      attribute: `attr${nodeId}`,
+    const result: AttributeRes = {
+      attribute: "",
     };
-    return res;
+    const data = {
+      word: word,
+    };
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/word`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (res.status == 200) {
+      const json = await res.json();
+      console.log(json);
+      result.attribute = json.attribute;
+    } else {
+      console.log(res.body);
+    }
+    return result;
   };
 
   return (
