@@ -1,6 +1,15 @@
 import dagre from "dagre";
 import { useState } from "react";
 import ReactFlow, { Edge, Node, Position, useReactFlow } from "reactflow";
+import CustomNode from "./CustomNode";
+import senbeiImage from "../assets/senbei.png";
+import demoImage from "../assets/demo.png";
+
+import "./graph.css";
+
+const nodeTypes = {
+  custom: CustomNode,
+};
 
 type AttributeRes = {
   attribute: string;
@@ -68,12 +77,16 @@ const Graph = () => {
   const [selectedId, setSelectedNodeId] = useState<string | undefined>(
     undefined
   );
-  const { setCenter } = useReactFlow();
+  const { setCenter, fitView } = useReactFlow();
 
   const [input, setInput] = useState("");
   const [attribute, setAttribute] = useState("");
   const [plusWord, setPlusWord] = useState("");
   const [minusWord, setMinusWord] = useState("");
+
+  const fit = () => {
+    fitView();
+  };
 
   const focusNode = (node: Node) => {
     console.log(`focus: ${node.id}`);
@@ -82,11 +95,11 @@ const Graph = () => {
     setCenter(
       node.position.x + node.width! / 2,
       node.position.y + node.height! / 2,
-      { duration: 500, zoom: 3 }
+      { duration: 500, zoom: 1.8 }
     );
   };
 
-  const addNodes = (labels: string[]): Node[] => {
+  const addNodes = (labels: string[], isRoot: boolean = false): Node[] => {
     console.log("add node");
     let nextId = nodeId;
     const newNodes: Node[] = [];
@@ -94,10 +107,12 @@ const Graph = () => {
       nextId = nextId + 1;
       newNodes.push({
         id: nextId.toString(),
+        type: isRoot ? "custom" : undefined,
         position: { x: 0, y: 0 },
         data: { label: `${label}` },
         selected: false,
       });
+      isRoot = false;
     }
     const afterNodes = [...nodes, ...newNodes];
     setNodes(afterNodes);
@@ -108,18 +123,26 @@ const Graph = () => {
   type AddEdgeParam = {
     source: string;
     target: string;
+    choice: boolean;
   };
   const addEdges = (params: AddEdgeParam[]): Edge[] => {
     console.log("add edge");
     let nextId = edgeId;
     const newEdges: Edge[] = [];
     for (const param of params) {
+      const choiceStr = param.choice ? "食べる" : "食べない";
       nextId = nextId + 1;
       newEdges.push({
         id: nextId.toString(),
         source: param.source,
         target: param.target,
-        animated: true,
+        animated: false,
+        zIndex: 1,
+        style: {
+          strokeWidth: 15,
+          stroke: "#6a3906",
+        },
+        label: choiceStr,
       });
     }
     const afterEdges = [...edges, ...newEdges];
@@ -132,9 +155,12 @@ const Graph = () => {
     labels: string[];
     edgeParams: AddEdgeParam[];
   };
-  const addElemetnts = (param: AddElementParam): [Node[], Edge[]] => {
+  const addElemetnts = (
+    param: AddElementParam,
+    isRoot: boolean = false
+  ): [Node[], Edge[]] => {
     console.log("add element");
-    const newNodes = addNodes(param.labels);
+    const newNodes = addNodes(param.labels, isRoot);
     const newEdges = addEdges(param.edgeParams);
     return [newNodes, newEdges];
   };
@@ -149,12 +175,26 @@ const Graph = () => {
     focusNode(node);
   };
 
+  const onEdgeClick = (_: React.MouseEvent, edge: Edge) => {
+    const targetNode = nodes.filter((node) => node.id === edge.target)[0];
+    // focusNode(targetNode);
+    setSelectedNodeId(targetNode.id);
+    if (edge.label === "食べる") {
+      onChoice(true);
+    } else {
+      onChoice(false);
+    }
+  };
+
   const onInit = () => {
     subimt(input, (0).toString(), true);
   };
 
   const onChoice = (choiced: boolean) => {
-    subimt(choiced ? plusWord : minusWord, selectedId!.toString());
+    setSelectedNodeId((prev) => {
+      subimt(choiced ? plusWord : minusWord, prev!.toString());
+      return prev;
+    });
   };
 
   const subimt = async (
@@ -180,13 +220,15 @@ const Graph = () => {
     param.edgeParams.push({
       source: selectedId,
       target: (targetBaseId + 1).toString(),
+      choice: false,
     });
     param.labels.push(nextRes.plus.word);
     param.edgeParams.push({
       source: selectedId,
       target: (targetBaseId + 2).toString(),
+      choice: true,
     });
-    const [newNodes, newEdges] = addElemetnts(param);
+    const [newNodes, newEdges] = addElemetnts(param, isInit);
     console.log(newEdges);
     setNodeId((prev) => {
       console.log(prev);
@@ -271,37 +313,43 @@ const Graph = () => {
     }
     return result;
   };
-
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <div style={{ display: "block", marginBottom: 15 }}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <button onClick={onInit} style={{ borderColor: "white" }}>
-          init
-        </button>
-      </div>
-      <button
-        onClick={() => (selectedId ? onChoice(false) : undefined)}
-        style={{ borderColor: "white" }}
-      >
-        minus
-      </button>
-      <a>{attribute}</a>
-      <button
-        onClick={() => (selectedId ? onChoice(true) : undefined)}
-        style={{ borderColor: "white", marginBottom: 15 }}
-      >
-        plus
-      </button>
-      <ReactFlow
-        nodes={layoutedNodes}
-        edges={layoutedEdges}
-        onNodeClick={onNodeClick}
-      ></ReactFlow>
+    <div>
+      <body id="body">
+        <h1>しかしかパラダイス!!!</h1>
+        {nodes.length !== 0 ? <img src={senbeiImage} id="senbei" /> : undefined}
+        <div id="container">
+          <div style={{ width: "100vw", height: "100vh" }}>
+            <ReactFlow
+              nodes={layoutedNodes}
+              edges={layoutedEdges}
+              onNodeClick={onNodeClick}
+              onEdgeClick={onEdgeClick}
+              nodeTypes={nodeTypes}
+            ></ReactFlow>
+          </div>
+          {nodes.length === 0 ? (
+            <img src={demoImage} alt="" id="dear" />
+          ) : undefined}
+          <input
+            id="firstword"
+            type="text"
+            value={nodes.length === 0 ? input : attribute}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          {nodes.length === 0 ? (
+            <button id="submitbutton" onClick={onInit}>
+              {" "}
+              名前をつける ƒ
+            </button>
+          ) : (
+            <button id="submitbutton" onClick={fit}>
+              {" "}
+              全体
+            </button>
+          )}
+        </div>
+      </body>
     </div>
   );
 };
