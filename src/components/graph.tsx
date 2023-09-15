@@ -1,6 +1,11 @@
 import dagre from "dagre";
 import { useState } from "react";
 import ReactFlow, { Edge, Node, Position, useReactFlow } from "reactflow";
+import CustomNode from "./CustomNode";
+
+const nodeTypes = {
+  custom: CustomNode,
+};
 
 type AttributeRes = {
   attribute: string;
@@ -86,7 +91,7 @@ const Graph = () => {
     );
   };
 
-  const addNodes = (labels: string[]): Node[] => {
+  const addNodes = (labels: string[], isRoot: boolean = false): Node[] => {
     console.log("add node");
     let nextId = nodeId;
     const newNodes: Node[] = [];
@@ -94,10 +99,12 @@ const Graph = () => {
       nextId = nextId + 1;
       newNodes.push({
         id: nextId.toString(),
+        type: isRoot ? "custom" : undefined,
         position: { x: 0, y: 0 },
         data: { label: `${label}` },
         selected: false,
       });
+      isRoot = false;
     }
     const afterNodes = [...nodes, ...newNodes];
     setNodes(afterNodes);
@@ -120,6 +127,7 @@ const Graph = () => {
         source: param.source,
         target: param.target,
         animated: true,
+        zIndex: 1,
       });
     }
     const afterEdges = [...edges, ...newEdges];
@@ -132,9 +140,12 @@ const Graph = () => {
     labels: string[];
     edgeParams: AddEdgeParam[];
   };
-  const addElemetnts = (param: AddElementParam): [Node[], Edge[]] => {
+  const addElemetnts = (
+    param: AddElementParam,
+    isRoot: boolean = false
+  ): [Node[], Edge[]] => {
     console.log("add element");
-    const newNodes = addNodes(param.labels);
+    const newNodes = addNodes(param.labels, isRoot);
     const newEdges = addEdges(param.edgeParams);
     return [newNodes, newEdges];
   };
@@ -186,7 +197,7 @@ const Graph = () => {
       source: selectedId,
       target: (targetBaseId + 2).toString(),
     });
-    const [newNodes, newEdges] = addElemetnts(param);
+    const [newNodes, newEdges] = addElemetnts(param, isInit);
     console.log(newEdges);
     setNodeId((prev) => {
       console.log(prev);
@@ -271,7 +282,6 @@ const Graph = () => {
     }
     return result;
   };
-
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
       <div style={{ display: "block", marginBottom: 15 }}>
@@ -301,6 +311,7 @@ const Graph = () => {
         nodes={layoutedNodes}
         edges={layoutedEdges}
         onNodeClick={onNodeClick}
+        nodeTypes={nodeTypes}
       ></ReactFlow>
     </div>
   );
