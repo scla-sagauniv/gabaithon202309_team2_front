@@ -77,12 +77,16 @@ const Graph = () => {
   const [selectedId, setSelectedNodeId] = useState<string | undefined>(
     undefined
   );
-  const { setCenter } = useReactFlow();
+  const { setCenter, fitView } = useReactFlow();
 
   const [input, setInput] = useState("");
   const [attribute, setAttribute] = useState("");
   const [plusWord, setPlusWord] = useState("");
   const [minusWord, setMinusWord] = useState("");
+
+  const fit = () => {
+    fitView();
+  };
 
   const focusNode = (node: Node) => {
     console.log(`focus: ${node.id}`);
@@ -338,7 +342,12 @@ const Graph = () => {
               {" "}
               名前をつける ƒ
             </button>
-          ) : undefined}
+          ) : (
+            <button id="submitbutton" onClick={fit}>
+              {" "}
+              全体
+            </button>
+          )}
         </div>
       </body>
     </div>
