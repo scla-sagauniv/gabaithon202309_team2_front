@@ -1,7 +1,7 @@
 #body {
   display: flex;
   justify-content: center;
-  background-image: url("./assets/bokujo.jpeg");
+  background-image: url("../assets/bokujo.jpeg");
   background-size: 1000px;
   background-repeat: repeat-x;
   width: 100vw;
@@ -29,7 +29,7 @@
 
   position: absolute;
   bottom: 50px;
- opacity: 0.7;
+  opacity: 0.7;
 
 
 }
@@ -41,7 +41,7 @@
   width: 400px;
   position: absolute;
   right: 37%;
-  top:15%;
+  top: 15%;
 
 }
 
@@ -92,8 +92,8 @@ h1 {
   position: absolute;
   top: 1px;
   left: 37%;
-  
-  
+
+
 
 
 

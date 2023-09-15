@@ -2,6 +2,9 @@ import dagre from "dagre";
 import { useState } from "react";
 import ReactFlow, { Edge, Node, Position, useReactFlow } from "reactflow";
 import CustomNode from "./CustomNode";
+import senbeiImage from "../assets/senbei.png";
+
+import "./graph.css";
 
 const nodeTypes = {
   custom: CustomNode,
@@ -86,8 +89,8 @@ const Graph = () => {
     setSelectedNodeId(node.id);
     setCenter(
       node.position.x + node.width! / 2,
-      node.position.y + node.height! / 2,
-      { duration: 500, zoom: 3 }
+      node.position.y + node.height! / 2 + 100,
+      { duration: 500, zoom: 2 }
     );
   };
 
@@ -287,8 +290,8 @@ const Graph = () => {
     return result;
   };
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <div style={{ display: "block", marginBottom: 15 }}>
+    <div>
+      {/* <div style={{ display: "block", marginBottom: 15 }}>
         <input
           type="text"
           value={input}
@@ -297,7 +300,7 @@ const Graph = () => {
         <button onClick={onInit} style={{ borderColor: "white" }}>
           init
         </button>
-      </div>
+      </div> */}
       <button
         onClick={() => (selectedId ? onChoice(false) : undefined)}
         style={{ borderColor: "white" }}
@@ -311,12 +314,43 @@ const Graph = () => {
       >
         plus
       </button>
-      <ReactFlow
-        nodes={layoutedNodes}
-        edges={layoutedEdges}
-        onNodeClick={onNodeClick}
-        nodeTypes={nodeTypes}
-      ></ReactFlow>
+      <body id="body">
+        <h1>しかしかパラダイス!!!</h1>
+        <img src={senbeiImage} id="senbei" />
+        <div id="container">
+          <div style={{ display: "flex" }}>
+            <div style={{ display: "block" }}>
+              <button id="minusbutton">たべない！</button>
+              <p>minusWord</p>
+            </div>
+            <p>attribute</p>
+            <div style={{ display: "block" }}>
+              <button id="plusbutton" onClick={onInit}>
+                たべる！
+              </button>
+              <p>plusWord</p>
+            </div>
+          </div>
+          <p>word</p>
+          <div style={{ width: "100vw", height: "100vh" }}>
+            <ReactFlow
+              nodes={layoutedNodes}
+              edges={layoutedEdges}
+              onNodeClick={onNodeClick}
+              nodeTypes={nodeTypes}
+            ></ReactFlow>
+          </div>
+          <input
+            id="firstword"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button id="submitbutton" onClick={onInit}>
+            あげる
+          </button>
+        </div>
+      </body>
     </div>
   );
 };

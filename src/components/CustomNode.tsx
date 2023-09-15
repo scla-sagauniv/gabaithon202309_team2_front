@@ -19,13 +19,13 @@ export default function CustomNode({ data }: NodeProps) {
           src={demoImage}
           alt=""
           style={{
-            maxWidth: "300%",
+            maxWidth: "200%",
             height: "auto",
             // display: "block",
             position: "absolute",
-            top: "-50%",
+            top: "-60%",
             // top: 0,
-            left: "-100%",
+            left: "-50%",
             right: 0,
             bottom: 0,
             margin: "auto",
